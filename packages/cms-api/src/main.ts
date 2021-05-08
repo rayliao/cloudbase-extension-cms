@@ -7,8 +7,9 @@ import { NestExpressApplication, ExpressAdapter } from '@nestjs/platform-express
 import { AppModule } from './app.module'
 import { TimeoutInterceptor } from './interceptors/timeout.interceptor'
 import { AllExceptionsFilter } from './exceptions.filter'
-import { isRunInServerMode } from './utils'
+import { isDevEnv, isRunInServerMode } from './utils'
 import { TimeCost } from './interceptors/timecost.interceptor'
+import { SwaggerModule, DocumentBuilder, SwaggerDocumentOptions } from '@nestjs/swagger'
 
 const expressApp = express()
 const adapter = new ExpressAdapter(expressApp)
@@ -55,6 +56,23 @@ export async function bootstrap() {
 
   // hide x-powered-by: express header
   app.disable('x-powered-by')
+
+  // swagger
+  if (isDevEnv()) {
+    const docConfig = new DocumentBuilder()
+      .setTitle('iStep')
+      .setDescription('The iStep API Document')
+      .setVersion('1.0')
+      .addTag('istep')
+      .build()
+
+    const options: SwaggerDocumentOptions = {
+      operationIdFactory: (_, methodKey: string) => methodKey,
+    }
+    const document = SwaggerModule.createDocument(app, docConfig, options)
+
+    SwaggerModule.setup('/', app, document)
+  }
 
   // 兼容云函数与本地开发
   if (isRunInServerMode()) {
