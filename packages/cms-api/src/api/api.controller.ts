@@ -15,7 +15,6 @@ import { IsJSON, IsNumber, IsOptional } from 'class-validator'
 import { ActionGuard, RequestAuthGuard } from '@/guards'
 import { formatPayloadDate } from '@/utils'
 import { CloudBaseService, LocalCacheService } from '@/services'
-import { ApiProperty } from '@nestjs/swagger'
 import { ApiService } from './api.service'
 
 class IQuery {

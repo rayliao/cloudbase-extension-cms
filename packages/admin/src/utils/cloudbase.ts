@@ -120,11 +120,14 @@ export async function getAuthHeaderAsync() {
   // 直接读取本地
   let res = auth.getAuthHeader()
   const diff = Date.now() - gotAuthTime
-
   // TODO: 当期 SDK 同步获取的 token 可能是过期的
   // 临时解决办法：在首次获取时、间隔大于 3500S 时，刷新 token
   if (!res?.['x-cloudbase-credentials'] || !gotAuthHeader || diff > 3500000) {
-    res = await auth.getAuthHeaderAsync()
+    try {
+      res = await auth.getAuthHeaderAsync()
+    } catch (e) {
+      return res
+    }
     gotAuthHeader = true
     gotAuthTime = Date.now()
   }
